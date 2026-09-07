@@ -1,0 +1,7 @@
+allowBuilds:
+  sharp: true
+  skia-canvas: false
+  unrs-resolver: true
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
