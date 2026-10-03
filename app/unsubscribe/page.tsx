@@ -10,7 +10,15 @@ import { Input } from "@/components/ui/input"
 import Image from "next/image"
 import Link from "next/link"
 
-export default function Home() {
+interface Props {
+  searchParams: Promise<{
+    email?: string
+  }>
+}
+
+export default async function UnsubscribePage({ searchParams }: Props) {
+  const { email } = await searchParams
+
   return (
     <div className="flex w-full flex-col items-center justify-center gap-4 pt-8">
       <div className="flex gap-2">
@@ -31,25 +39,12 @@ export default function Home() {
         Create, share and download Minecraft creations.
       </p>
       <div className="flex w-full max-w-2xl flex-col gap-4 pt-12">
-        <p className="text-center">
-          This site is currently under development. Please check again later.
-          Enter your email below to join the waitlist for further information on
-          when the site is ready to use.
-        </p>
         <Card className="mt-12 p-4">
-          <CardTitle className="text-center">Sign up for waitlist</CardTitle>
-          <form method="POST" action="/api/notification/subscribe/email">
+          <CardTitle className="text-center">
+            Unsubscribe from the waitlist
+          </CardTitle>
+          <form method="POST" action="/api/notification/unsubscribe/email">
             <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="fieldgroup-name">Name</FieldLabel>
-                <Input
-                  id="fieldgroup-name"
-                  name="name"
-                  placeholder="Your Name"
-                  required
-                />
-              </Field>
-
               <Field>
                 <FieldLabel htmlFor="fieldgroup-email">Email</FieldLabel>
                 <Input
@@ -57,20 +52,21 @@ export default function Home() {
                   name="email"
                   type="email"
                   placeholder="name@example.com"
+                  defaultValue={email}
                   required
                 />
                 <FieldDescription>
-                  This address will be added to the waiting list.
+                  This address will be removed from the waiting list.
                 </FieldDescription>
               </Field>
 
               <Field orientation="horizontal" className="justify-between">
-                <Link href="/unsubscribe">Click here to unsubscribe</Link>
+                <Link href="/">Click here to go back</Link>
                 <div className="flex gap-2">
                   <Button type="reset" variant="outline">
                     Reset
                   </Button>
-                  <Button type="submit">Submit</Button>
+                  <Button type="submit">Unsubscribe</Button>
                 </div>
               </Field>
             </FieldGroup>
