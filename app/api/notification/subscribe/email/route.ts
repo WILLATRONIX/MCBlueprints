@@ -38,6 +38,7 @@ export async function POST(req: Request) {
     const data = await response.json()
 
     if (!response.ok) {
+      console.error(response)
       return Response.redirect(
         new URL(
           `${process.env.MCBPS_FRONTEND}/subscription-updated?state=${data.event}`,
