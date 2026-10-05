@@ -20,8 +20,6 @@ export default function BackgroundDots({
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    const dpr = window.devicePixelRatio || 1
-
     const mouse = {
       x: 0,
       y: 0,
@@ -30,156 +28,238 @@ export default function BackgroundDots({
       active: false,
     }
 
-    const brightness = new Map<string, number>()
+    let width = 0
+    let height = 0
+    let columns = 0
+    let rows = 0
 
-    const handleMouseMove = (event: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect()
+    let brightness = new Float32Array(0)
 
-      const x = event.clientX - rect.left
-      const y = event.clientY - rect.top
+    const activeCells = new Set<number>()
 
-      if (!mouse.active) {
-        mouse.previousX = x
-        mouse.previousY = y
-      } else {
-        mouse.previousX = mouse.x
-        mouse.previousY = mouse.y
-      }
+    let animationFrame: number | null = null
 
-      mouse.x = x
-      mouse.y = y
-      mouse.active = true
-    }
+    const minRadius = 120
+    const maxRadius = 0
+    const maxSpeed = 200
 
-    const handleMouseLeave = () => {
-      mouse.active = false
-    }
+    const brightnessPerFrame = 0.5
+    const decayPerFrame = 0.005
 
-    const resize = () => {
-      const rect = canvas.getBoundingClientRect()
+    const dotOffset = Math.floor(dotSize / 2)
 
-      canvas.width = Math.floor(rect.width * dpr)
-      canvas.height = Math.floor(rect.height * dpr)
+    let colour = ""
 
-      ctx.imageSmoothingEnabled = false
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    }
+    const getBaseFill = () => `color-mix(in oklch, ${colour} 30%, transparent)`
 
-    const draw = () => {
-      const rect = canvas.getBoundingClientRect()
-      const width = Math.floor(rect.width)
-      const height = Math.floor(rect.height)
+    const getBrightFill = (value: number) =>
+      `color-mix(in oklch, ${colour} 30%, white ${value * 80}%)`
 
-      const root = document.documentElement
-      const styles = getComputedStyle(root)
-      const colour = styles.getPropertyValue("--primary").trim()
-
+    const drawBackground = () => {
       ctx.clearRect(0, 0, width, height)
 
-      const dx = mouse.x - mouse.previousX
-      const dy = mouse.y - mouse.previousY
-      const speed = Math.sqrt(dx * dx + dy * dy)
+      ctx.fillStyle = getBaseFill()
 
-      const minRadius = 70
-      const maxRadius = 0
-      const maxSpeed = 400
-
-      const speedFactor = Math.min(speed / maxSpeed, 1)
-      const easedSpeed = speedFactor * speedFactor
-
-      const radius = maxRadius - easedSpeed * (maxRadius - minRadius)
-      const brightnessPerFrame = 0.5
-      const decayPerFrame = 0.025
-
-      if (mouse.active) {
-        const dx = mouse.x - mouse.previousX
-        const dy = mouse.y - mouse.previousY
-        const distance = Math.sqrt(dx * dx + dy * dy)
-
-        const steps = Math.max(1, Math.ceil(distance / (tileSize * 0.5)))
-
-        for (let i = 0; i <= steps; i++) {
-          const t = i / steps
-
-          const cursorX = mouse.previousX + dx * t
-          const cursorY = mouse.previousY + dy * t
-
-          const minX = Math.floor((cursorX - radius) / tileSize) * tileSize
-
-          const maxX = Math.ceil((cursorX + radius) / tileSize) * tileSize
-
-          const minY = Math.floor((cursorY - radius) / tileSize) * tileSize
-
-          const maxY = Math.ceil((cursorY + radius) / tileSize) * tileSize
-
-          for (let y = minY; y <= maxY; y += tileSize) {
-            for (let x = minX; x <= maxX; x += tileSize) {
-              const distanceX = x - cursorX
-              const distanceY = y - cursorY
-              const distance = Math.sqrt(
-                distanceX * distanceX + distanceY * distanceY
-              )
-
-              if (distance >= radius) continue
-
-              const key = `${x}:${y}`
-
-              const influence = Math.exp(
-                -(distance * distance) / (radius * radius * 0.05)
-              )
-
-              const current = brightness.get(key) ?? 0
-
-              brightness.set(
-                key,
-                Math.min(1, current + brightnessPerFrame * influence)
-              )
-            }
-          }
-        }
-      }
-
-      for (let y = 0; y < height; y += tileSize) {
-        for (let x = 0; x < width; x += tileSize) {
-          const key = `${x}:${y}`
-          let value = brightness.get(key) ?? 0
-
-          value = Math.max(0, value - decayPerFrame)
-
-          if (value > 0) {
-            brightness.set(key, value)
-          } else {
-            brightness.delete(key)
-          }
-
-          const fill =
-            value === 0
-              ? `color-mix(in oklch, ${colour} 30%, transparent)`
-              : `color-mix(in oklch, ${colour} 30%, white ${value * 80}%)`
-
-          ctx.fillStyle = fill
+      for (let row = 0; row < rows; row++) {
+        for (let column = 0; column < columns; column++) {
           ctx.fillRect(
-            x - Math.floor(dotSize / 2),
-            y - Math.floor(dotSize / 2),
+            column * tileSize - dotOffset,
+            row * tileSize - dotOffset,
             dotSize,
             dotSize
           )
         }
       }
-
-      requestAnimationFrame(draw)
     }
 
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect()
+
+      width = Math.floor(rect.width)
+      height = Math.floor(rect.height)
+
+      columns = Math.ceil(width / tileSize)
+      rows = Math.ceil(height / tileSize)
+
+      canvas.width = width
+      canvas.height = height
+
+      ctx.imageSmoothingEnabled = false
+      ctx.setTransform(1, 0, 0, 1, 0, 0)
+
+      brightness = new Float32Array(columns * rows)
+
+      activeCells.clear()
+
+      drawBackground()
+    }
+
+    const draw = () => {
+      animationFrame = null
+
+      const dx = mouse.x - mouse.previousX
+      const dy = mouse.y - mouse.previousY
+
+      const speed = Math.sqrt(dx * dx + dy * dy)
+
+      const speedFactor = Math.min(speed / maxSpeed, 1)
+
+      const easedSpeed = speedFactor * speedFactor
+
+      const radius = maxRadius - easedSpeed * (maxRadius - minRadius)
+
+      if (mouse.active && radius > 0) {
+        const distance = speed
+
+        const steps = Math.max(1, Math.ceil(distance / (tileSize * 0.5)))
+
+        const radiusSquared = radius * radius
+
+        const falloff = radiusSquared * 0.05
+
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps
+
+          const cursorX = mouse.previousX + dx * t
+
+          const cursorY = mouse.previousY + dy * t
+
+          const minX = Math.max(0, Math.floor((cursorX - radius) / tileSize))
+
+          const maxX = Math.min(
+            columns - 1,
+            Math.ceil((cursorX + radius) / tileSize)
+          )
+
+          const minY = Math.max(0, Math.floor((cursorY - radius) / tileSize))
+
+          const maxY = Math.min(
+            rows - 1,
+            Math.ceil((cursorY + radius) / tileSize)
+          )
+
+          for (let row = minY; row <= maxY; row++) {
+            const y = row * tileSize
+            const rowOffset = row * columns
+
+            for (let column = minX; column <= maxX; column++) {
+              const x = column * tileSize
+
+              const distanceX = x - cursorX
+
+              const distanceY = y - cursorY
+
+              const distanceSquared =
+                distanceX * distanceX + distanceY * distanceY
+
+              if (distanceSquared >= radiusSquared) {
+                continue
+              }
+
+              const influence = Math.exp(-distanceSquared / falloff)
+
+              const index = rowOffset + column
+
+              brightness[index] = Math.min(
+                1,
+                brightness[index] + brightnessPerFrame * influence
+              )
+
+              activeCells.add(index)
+            }
+          }
+        }
+      }
+
+      for (const index of activeCells) {
+        let value = brightness[index]
+
+        value = Math.max(0, value - decayPerFrame)
+
+        brightness[index] = value
+
+        const row = Math.floor(index / columns)
+
+        const column = index - row * columns
+
+        const x = column * tileSize - dotOffset
+
+        const y = row * tileSize - dotOffset
+
+        ctx.clearRect(x, y, dotSize, dotSize)
+
+        if (value > 0) {
+          ctx.fillStyle = getBrightFill(value)
+
+          ctx.fillRect(x, y, dotSize, dotSize)
+        } else {
+          ctx.fillStyle = getBaseFill()
+
+          ctx.fillRect(x, y, dotSize, dotSize)
+
+          activeCells.delete(index)
+        }
+      }
+
+      mouse.previousX = mouse.x
+      mouse.previousY = mouse.y
+
+      if (mouse.active || activeCells.size > 0) {
+        animationFrame = requestAnimationFrame(draw)
+      }
+    }
+
+    const startAnimation = () => {
+      if (animationFrame === null) {
+        animationFrame = requestAnimationFrame(draw)
+      }
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const rect = canvas.getBoundingClientRect()
+
+      const x = event.clientX - rect.left
+
+      const y = event.clientY - rect.top
+
+      if (!mouse.active) {
+        mouse.previousX = x
+        mouse.previousY = y
+      }
+
+      mouse.x = x
+      mouse.y = y
+      mouse.active = true
+
+      startAnimation()
+    }
+
+    const handleMouseLeave = () => {
+      mouse.active = false
+      startAnimation()
+    }
+
+    colour = getComputedStyle(document.documentElement)
+      .getPropertyValue("--primary")
+      .trim()
+
     resize()
-    draw()
 
     window.addEventListener("resize", resize)
+
     window.addEventListener("mousemove", handleMouseMove)
+
     window.addEventListener("mouseleave", handleMouseLeave)
 
     return () => {
+      if (animationFrame !== null) {
+        cancelAnimationFrame(animationFrame)
+      }
+
       window.removeEventListener("resize", resize)
+
       window.removeEventListener("mousemove", handleMouseMove)
+
       window.removeEventListener("mouseleave", handleMouseLeave)
     }
   }, [tileSize, dotSize, theme.theme])
@@ -187,7 +267,7 @@ export default function BackgroundDots({
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0 top-1/2 left-1/2 z-0 h-[256rem] w-[256rem] -translate-1/2"
+      className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       style={{
         display: "block",
         imageRendering: "pixelated",

@@ -20,20 +20,20 @@ export default async function UnsubscribePage({ searchParams }: Props) {
   const { email } = await searchParams
 
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-4 pt-8">
-      <div className="flex gap-2">
+    <div className="flex w-full flex-col items-center justify-center gap-4 px-4 pt-8">
+      <div className="flex items-center gap-2">
         <Image
           src="https://static.mcbps.com/logo-15px.webp"
           alt="MCBlueprints Logo"
           width={60}
           height={60}
           loading="eager"
-          className="invert dark:invert-0"
+          className="h-10 w-10 invert md:h-15 md:w-15 dark:invert-0"
           style={{
             imageRendering: "pixelated",
           }}
         />
-        <p className="text-6xl font-semibold">MCBlueprints</p>
+        <p className="text-4xl font-semibold md:text-6xl">MCBlueprints</p>
       </div>
       <p className="text-center text-2xl">
         Create, share and download Minecraft creations.
@@ -61,7 +61,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
               </Field>
 
               <Field orientation="horizontal" className="justify-between">
-                <Link href="/">Click here to go back</Link>
+                <Link href="/">Go back</Link>
                 <div className="flex gap-2">
                   <Button type="reset" variant="outline">
                     Reset
