@@ -5,7 +5,10 @@ export async function POST(req: Request) {
 
   if (typeof email !== "string" || !email.trim()) {
     return Response.redirect(
-      new URL("/subscription-updated?state=failed", req.url),
+      new URL(
+        `${process.env.MCBPS_FRONTEND}/subscription-updated?state=failed`,
+        req.url
+      ),
       303
     )
   }
@@ -35,14 +38,20 @@ export async function POST(req: Request) {
     }
 
     return Response.redirect(
-      new URL("/subscription-updated?state=removed", req.url),
+      new URL(
+        `${process.env.MCBPS_FRONTEND}/subscription-updated?state=removed`,
+        req.url
+      ),
       303
     )
   } catch (error) {
     console.error("API request failed:", error)
 
     return Response.redirect(
-      new URL("/subscription-updated?state=failed", req.url),
+      new URL(
+        `${process.env.MCBPS_FRONTEND}/subscription-updated?state=failed`,
+        req.url
+      ),
       303
     )
   }
