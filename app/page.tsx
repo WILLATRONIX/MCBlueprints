@@ -1,15 +1,6 @@
-import { Captcha, WaitlistForm } from "@/components/blocks/waitlist-form"
-import { Button } from "@/components/ui/button"
+import { WaitlistForm } from "@/components/blocks/waitlist-form"
 import { Card, CardTitle } from "@/components/ui/card"
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
 import Image from "next/image"
-import Link from "next/link"
 
 export default function Home() {
   return (
