@@ -26,6 +26,7 @@ export async function POST(req: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.MCBPS_API_KEY}`,
         },
         body: JSON.stringify({
           name: name.trim(),

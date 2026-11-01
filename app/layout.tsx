@@ -4,7 +4,6 @@ import "./globals.css"
 import { cn } from "@/lib/utils"
 import { ThemeProvider } from "@/components/theme-provider"
 import BackgroundDots from "@/components/blocks/background-dots"
-import Script from "next/script"
 
 const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -59,16 +58,12 @@ export default function RootLayout({
           type="image/webp"
           href="https://static.mcbps.com/logo.webp"
         />
-        <Script
-          src="https://ff34dae1aaa4.edge.captcha-sdk.awswaf.com/ff34dae1aaa4/jsapi.js"
-          strategy="afterInteractive"
-        />
       </head>
-      <body className="flex min-h-screen flex-col overflow-hidden">
+      <body className="flex min-h-screen flex-col">
         <ThemeProvider>
           <div className="relative flex min-h-full flex-1 flex-col bg-background">
             <BackgroundDots />
-            <main className="relative z-10 flex min-h-full flex-1 flex-col">
+            <main className="relative z-10 flex min-h-full flex-1 flex-col pb-10">
               {children}
             </main>
           </div>

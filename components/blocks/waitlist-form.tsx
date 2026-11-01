@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Script from "next/script"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,25 +11,56 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import Link from "next/link"
+import { cn } from "@/lib/utils"
 
 declare global {
   interface Window {
     AwsWafIntegration: {
       fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
     }
+    AwsWafCaptcha: {
+      renderCaptcha: (
+        container: HTMLElement,
+        options: {
+          apiKey: string
+          disableLanguageSelector: boolean
+          onSuccess: () => void
+          onError?: (error: unknown) => void
+        }
+      ) => void
+    }
   }
 }
 
 export function WaitlistForm() {
   const captchaRef = useRef<HTMLDivElement>(null)
-  const formRef = useRef<HTMLFormElement>(null)
+  const [captchaComplete, setCaptchaComplete] = useState(false)
+  const [captchaLoaded, setCaptchaLoaded] = useState(false)
+  const [showCaptcha, setShowCaptcha] = useState(false)
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const renderCaptcha = () => {
+    if (!captchaRef.current || !window.AwsWafCaptcha) return
+
+    window.AwsWafCaptcha.renderCaptcha(captchaRef.current, {
+      apiKey: process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY!,
+      disableLanguageSelector: true,
+      onSuccess: () => setCaptchaComplete(true),
+      onError: () => setCaptchaComplete(false),
+    })
+  }
+
+  const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (!showCaptcha) {
+      setShowCaptcha(true)
+      return
+    }
+
+    if (!captchaComplete) return
 
     const form = event.currentTarget
     const formData = new FormData(form)
-
     const body = new URLSearchParams()
 
     for (const [key, value] of formData.entries()) {
@@ -38,30 +69,39 @@ export function WaitlistForm() {
       }
     }
 
-    const response = await window.AwsWafIntegration.fetch(form.action, {
-      method: "POST",
-      body,
-    })
+    try {
+      const response = await window.AwsWafIntegration.fetch(form.action, {
+        method: "POST",
+        body,
+        credentials: "include",
+      })
 
-    if (response.redirected) {
-      window.location.assign(response.url)
-      return
-    }
+      if (response.redirected) {
+        window.location.assign(response.url)
+        return
+      }
 
-    if (!response.ok) {
-      throw new Error("Unable to submit your registration.")
+      if (!response.ok) {
+        throw new Error("Unable to submit your registration.")
+      }
+    } catch (error) {
+      console.error(error)
     }
   }
+
+  useEffect(() => {
+    if (captchaLoaded) renderCaptcha()
+  }, [captchaLoaded])
 
   return (
     <>
       <Script
         src={process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_SCRIPT_URL}
         strategy="afterInteractive"
+        onLoad={() => setCaptchaLoaded(true)}
       />
 
       <form
-        ref={formRef}
         method="POST"
         action="/api/notification/subscribe/email"
         onSubmit={handleSubmit}
@@ -91,7 +131,12 @@ export function WaitlistForm() {
             </FieldDescription>
           </Field>
 
-          <div ref={captchaRef} />
+          <div className="flex w-full items-center justify-center">
+            <div
+              ref={captchaRef}
+              className={cn("hidden bg-mist-200 p-2", showCaptcha && "flex")}
+            />
+          </div>
 
           <Field orientation="horizontal" className="justify-between">
             <Link href="/unsubscribe">Click here to unsubscribe</Link>
@@ -99,7 +144,9 @@ export function WaitlistForm() {
               <Button type="reset" variant="outline">
                 Reset
               </Button>
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={!captchaComplete && showCaptcha}>
+                Submit
+              </Button>
             </div>
           </Field>
         </FieldGroup>
