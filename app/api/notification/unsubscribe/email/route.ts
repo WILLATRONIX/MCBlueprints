@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         `${process.env.MCBPS_FRONTEND}/subscription-updated?state=failed`,
         req.url
       ),
-      303
+      500
     )
   }
 }
