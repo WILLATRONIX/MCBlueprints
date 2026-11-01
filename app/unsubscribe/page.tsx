@@ -23,7 +23,7 @@ export default async function UnsubscribePage({ searchParams }: Props) {
     <div className="flex w-full flex-col items-center justify-center gap-4 px-4 pt-8">
       <div className="flex items-center gap-2">
         <Image
-          src="https://static.mcbps.com/logo-15px.webp"
+          src="https://static.mcbps.com/logo.webp"
           alt="MCBlueprints Logo"
           width={60}
           height={60}

@@ -1,3 +1,4 @@
+import { Captcha, WaitlistForm } from "@/components/blocks/waitlist-form"
 import { Button } from "@/components/ui/button"
 import { Card, CardTitle } from "@/components/ui/card"
 import {
@@ -15,7 +16,7 @@ export default function Home() {
     <div className="flex w-full flex-col items-center justify-center gap-4 px-4 pt-8">
       <div className="flex items-center gap-2">
         <Image
-          src="https://static.mcbps.com/logo-15px.webp"
+          src="https://static.mcbps.com/logo.webp"
           alt="MCBlueprints Logo"
           width={60}
           height={60}
@@ -38,43 +39,7 @@ export default function Home() {
         </p>
         <Card className="mt-12 p-4">
           <CardTitle className="text-center">Sign up for waitlist</CardTitle>
-          <form method="POST" action="/api/notification/subscribe/email">
-            <FieldGroup>
-              <Field>
-                <FieldLabel htmlFor="fieldgroup-name">Name</FieldLabel>
-                <Input
-                  id="fieldgroup-name"
-                  name="name"
-                  placeholder="Your Name"
-                  required
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="fieldgroup-email">Email</FieldLabel>
-                <Input
-                  id="fieldgroup-email"
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                />
-                <FieldDescription>
-                  This address will be added to the waiting list.
-                </FieldDescription>
-              </Field>
-
-              <Field orientation="horizontal" className="justify-between">
-                <Link href="/unsubscribe">Click here to unsubscribe</Link>
-                <div className="flex gap-2">
-                  <Button type="reset" variant="outline">
-                    Reset
-                  </Button>
-                  <Button type="submit">Submit</Button>
-                </div>
-              </Field>
-            </FieldGroup>
-          </form>
+          <WaitlistForm />
         </Card>
       </div>
     </div>

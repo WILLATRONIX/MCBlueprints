@@ -38,10 +38,19 @@ export async function POST(req: Request) {
     const data = await response.json()
 
     if (!response.ok) {
-      console.error(response)
       return Response.redirect(
         new URL(
           `${process.env.MCBPS_FRONTEND}/subscription-updated?state=${data.event}`,
+          req.url
+        ),
+        303
+      )
+    }
+
+    if (data.emailSubscription.is_verified === true) {
+      return Response.redirect(
+        new URL(
+          `${process.env.MCBPS_FRONTEND}/subscription-updated?state=verified`,
           req.url
         ),
         303
@@ -56,7 +65,7 @@ export async function POST(req: Request) {
       303
     )
   } catch (error) {
-    console.error("API request failed:", error)
+    console.error(error)
 
     return Response.redirect(
       new URL(
