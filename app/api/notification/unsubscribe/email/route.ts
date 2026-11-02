@@ -34,7 +34,10 @@ export async function POST(req: Request) {
     if (!response.ok) {
       console.error(response)
       return Response.redirect(
-        new URL(`/subscription-updated?state=${data.event}`, req.url),
+        new URL(
+          `${process.env.MCBPS_FRONTEND}/subscription-updated?state=${data.event}`,
+          req.url
+        ),
         303
       )
     }
