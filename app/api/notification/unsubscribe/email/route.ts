@@ -33,6 +33,7 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       console.error(response)
+      console.log(process.env.MCBPS_API_KEY)
       return Response.redirect(
         new URL(
           `${process.env.MCBPS_FRONTEND}/subscription-updated?state=${data.event}`,
