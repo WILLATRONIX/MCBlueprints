@@ -159,11 +159,10 @@ export function WaitlistForm() {
           </Field>
 
           <div className="flex w-full items-center justify-center">
-            {!process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY && (
-              <p className="text-destructive">
-                {process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY}
-              </p>
-            )}
+            <p>test</p>
+            <p className="text-destructive">
+              {process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY}
+            </p>
             <div
               ref={captchaRef}
               className={cn("hidden bg-mist-200 p-2", showCaptcha && "flex")}
