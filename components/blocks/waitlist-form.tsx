@@ -38,16 +38,7 @@ export function WaitlistForm() {
   const [captchaLoaded, setCaptchaLoaded] = useState(false)
   const [showCaptcha, setShowCaptcha] = useState(false)
 
-  const renderCaptcha = () => {
-    if (!captchaRef.current || !window.AwsWafCaptcha) return
-
-    window.AwsWafCaptcha.renderCaptcha(captchaRef.current, {
-      apiKey: process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY!,
-      disableLanguageSelector: true,
-      onSuccess: () => setCaptchaComplete(true),
-      onError: () => setCaptchaComplete(false),
-    })
-  }
+  const captchaRendered = useRef(false)
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -90,15 +81,51 @@ export function WaitlistForm() {
   }
 
   useEffect(() => {
-    if (captchaLoaded) renderCaptcha()
-  }, [captchaLoaded])
+    if (
+      !captchaLoaded ||
+      !showCaptcha ||
+      !captchaRef.current ||
+      !window.AwsWafCaptcha ||
+      captchaRendered.current
+    ) {
+      return
+    }
+
+    captchaRendered.current = true
+
+    try {
+      window.AwsWafCaptcha.renderCaptcha(captchaRef.current, {
+        apiKey: process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY!,
+        disableLanguageSelector: true,
+        onSuccess: () => setCaptchaComplete(true),
+        onError: (error) => {
+          console.error("AWS CAPTCHA error:", error)
+          setCaptchaComplete(false)
+          captchaRendered.current = false
+        },
+      })
+    } catch (error) {
+      console.error("AWS CAPTCHA initialisation failed:", error)
+      captchaRendered.current = false
+    }
+  }, [captchaLoaded, showCaptcha])
 
   return (
     <>
       <Script
         src={process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_SCRIPT_URL}
         strategy="afterInteractive"
-        onLoad={() => setCaptchaLoaded(true)}
+        onLoad={() => {
+          console.log("AWS WAF script loaded")
+          console.log(process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_SCRIPT_URL)
+          console.log(process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY)
+          console.log(window.AwsWafCaptcha)
+          console.log(window.AwsWafIntegration)
+          setCaptchaLoaded(true)
+        }}
+        onError={(error) => {
+          console.error("AWS WAF script failed:", error)
+        }}
       />
 
       <form
