@@ -38,7 +38,17 @@ export function WaitlistForm() {
   const [captchaLoaded, setCaptchaLoaded] = useState(false)
   const [showCaptcha, setShowCaptcha] = useState(false)
 
-  const captchaRendered = useRef(false)
+  const renderCaptcha = () => {
+    if (!captchaRef.current || !window.AwsWafCaptcha) return
+
+    window.AwsWafCaptcha.renderCaptcha(captchaRef.current, {
+      apiKey:
+        "KggvqRhnYYhYtSG/D66pdrIUnobbqt0TqNq6KTW8GkJcBX8dDcRnhQhY4PFnrbD7KEesKEvRX0nhMldYxBxLnO62PUNvllCvjfIlSMeqXx3A+fbw8Ink6qYf/2Vk6G7BfCzhNPXyAsTQYiEeQhNX/DFjnenjVurCm4yShJevvzmqCnCOGJgk8bvAFkzL/hiuWLG+IolzRq9oYz5sSqegCQlbvkbPot0SqLtGJFjNATodzGxr0dzOGing7MBKsN/oIpizin4tAi/1ih7vjLgc9ZpE31VwOkbrZX2QfgSD+Fy4eudoQRBHoHOO3jAer52EcXk/7jFv0cOG6CEOoWqZg7dPwIrEFjuUsRMIjsUlRk+EFr9h2MNBwyl9oUehqI2ppxTQs+SDTnu2bx8AQM1iX0W3Tv2G8+FR3CXV2jfn3WzzgsvH0teUjLI85ghwnnziXfaoU3I/zVdpFhmVkkJsQ3xaj3jYFQEXYMpl9uffhRPkdK5ZAXeuLg1Eu64+LJOcTP50340MN3VlMRDvrWRHZwoXSwxTREIeSWz5GtOHD9pG951x4M8f3zLLIuqRtpC/1sCHeMrfB4OdMlU1qgJUw5BjY2LJZvQyyjGA5aQFZ10+/egZmgUntJEXKBRoeEy7gvdxrEdpcTs5pxXLddx1Rk5y6paSaJlSNJHIdrWFUfM=_1_1",
+      disableLanguageSelector: true,
+      onSuccess: () => setCaptchaComplete(true),
+      onError: () => setCaptchaComplete(false),
+    })
+  }
 
   const handleSubmit = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -81,51 +91,17 @@ export function WaitlistForm() {
   }
 
   useEffect(() => {
-    if (
-      !captchaLoaded ||
-      !showCaptcha ||
-      !captchaRef.current ||
-      !window.AwsWafCaptcha ||
-      captchaRendered.current
-    ) {
-      return
-    }
-
-    captchaRendered.current = true
-
-    try {
-      window.AwsWafCaptcha.renderCaptcha(captchaRef.current, {
-        apiKey: process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY!,
-        disableLanguageSelector: true,
-        onSuccess: () => setCaptchaComplete(true),
-        onError: (error) => {
-          console.error("AWS CAPTCHA error:", error)
-          setCaptchaComplete(false)
-          captchaRendered.current = false
-        },
-      })
-    } catch (error) {
-      console.error("AWS CAPTCHA initialisation failed:", error)
-      captchaRendered.current = false
-    }
-  }, [captchaLoaded, showCaptcha])
+    if (captchaLoaded) renderCaptcha()
+  }, [captchaLoaded])
 
   return (
     <>
       <Script
-        src={process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_SCRIPT_URL}
+        src={
+          "https://ff34dae1aaa4.edge.captcha-sdk.awswaf.com/ff34dae1aaa4/jsapi.js"
+        }
         strategy="afterInteractive"
-        onLoad={() => {
-          console.log("AWS WAF script loaded")
-          console.log(process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_SCRIPT_URL)
-          console.log(process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY)
-          console.log(window.AwsWafCaptcha)
-          console.log(window.AwsWafIntegration)
-          setCaptchaLoaded(true)
-        }}
-        onError={(error) => {
-          console.error("AWS WAF script failed:", error)
-        }}
+        onLoad={() => setCaptchaLoaded(true)}
       />
 
       <form
@@ -159,10 +135,6 @@ export function WaitlistForm() {
           </Field>
 
           <div className="flex w-full items-center justify-center">
-            <p>test</p>
-            <p className="text-destructive">
-              {process.env.NEXT_PUBLIC_AWS_WAF_CAPTCHA_API_KEY}
-            </p>
             <div
               ref={captchaRef}
               className={cn("hidden bg-mist-200 p-2", showCaptcha && "flex")}
