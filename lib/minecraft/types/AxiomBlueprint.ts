@@ -1,7 +1,9 @@
+import { FileFormat } from "@/lib/types/upload";
 import type { Region } from "./Region";
 
 export class Blueprint {
 	readonly magic = 0xae5bb36;
+	fileFormat: FileFormat;
 	name: string;
 	blockCount: number;
 	version: number;
@@ -14,6 +16,7 @@ export class Blueprint {
 	regions: Region[];
 
 	constructor(data: {
+		fileFormat: FileFormat;
 		magic: number;
 		name: string;
 		blockCount: number;
@@ -29,6 +32,7 @@ export class Blueprint {
 		if (data.magic !== 0xae5bb36) {
 			throw new Error("Invalid blueprint data.");
 		}
+		this.fileFormat = data.fileFormat;
 		this.name = data.name;
 		this.thumbnail = data.thumbnail;
 		this.blockCount = data.blockCount;

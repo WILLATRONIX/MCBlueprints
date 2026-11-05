@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 
 // Types
-type StepperOrientation = "horizontal" | "vertical";
+export type StepperOrientation = "horizontal" | "vertical";
 type StepState = "active" | "completed" | "inactive" | "loading";
 type StepIndicators = {
 	active?: React.ReactNode;
@@ -143,6 +143,7 @@ function Stepper({
 			triggerNodes,
 			indicators,
 		}),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[
 			currentStep,
 			handleSetActiveStep,
@@ -250,7 +251,7 @@ function StepperTrigger({
 		if (btnRef.current) {
 			registerTrigger(btnRef.current);
 		}
-	}, [btnRef.current]);
+	}, [btnRef.current, registerTrigger]);
 
 	// Find our index among triggers for navigation
 	const myIdx = useMemo(

@@ -83,11 +83,10 @@ export const Dropzone = ({
 		>
 			<Button
 				className={cn(
-					"relative w-full h-full flex-col overflow-hidden [clip-path:none] bg-cyan-950 ring-2 ring-ring/50 p-0",
-					isDragActive && "outline-none ring-2 ring-ring",
+					"relative w-full h-full flex-col overflow-hidden border border-ring/80 border-dashed [clip-path:none] p-0 hover:bg-muted",
+					isDragActive && "outline-none ring-2 ring-ring border-none",
 					className,
 				)}
-				wrapperClassName="drop-shadow-none w-full h-full"
 				disabled={disabled}
 				type="button"
 				{...getRootProps()}
@@ -185,7 +184,7 @@ export const DropzoneEmptyState = ({
 
 	return (
 		<div className={cn("flex flex-col items-center justify-center", className)}>
-			<div className="flex size-8 items-center justify-center bg-cyan-700 text-cyan-100">
+			<div className="flex size-8 items-center justify-center bg-primary text-cyan-100">
 				<UploadIcon size={16} />
 			</div>
 			<p className="my-2 w-full truncate text-wrap font-medium text-sm">

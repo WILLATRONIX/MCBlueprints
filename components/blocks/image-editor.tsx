@@ -31,7 +31,7 @@ export default function ImageEditor({
 	defaultAspectRatio = "1:1",
 	onChangeAction = () => {},
 }: {
-	defaultFile: File;
+	defaultFile: File | null;
 	aspectRatioLocked: boolean;
 	defaultAspectRatio: string;
 	onChangeAction?: (file: File) => void;

@@ -7,7 +7,7 @@ import socket from "@/lib/websocket/websocketService";
 import { FaultService } from "@/lib/fault/faultService";
 import { Fault } from "@/lib/fault/fault";
 
-const faultService = new FaultService(__filename);
+const faultService = new FaultService("/discover/[[...category]]");
 
 export default function DiscoverGrid({ assets }: { assets: Asset[] }) {
 	return (

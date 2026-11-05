@@ -1,0 +1,167 @@
+{
+	"mcbps": {
+		"slogan": "Create, share and download Minecraft creations.",
+		"pages": {
+			"landing": {
+				"discover_button": "Discover",
+				"sign_up_button": "Sign Up"
+			},
+			"signup": {
+				"signup_title": "Sign up to MCBlueprints",
+				"email_input": {
+					"descriptor": "Email",
+					"placeholder": "Enter your email"
+				},
+				"password_input": {
+					"descriptor": "Password",
+					"placeholder": "Create a password"
+				},
+				"repeat_password_input": {
+					"descriptor": "Repeat Password",
+					"placeholder": "Enter your password again"
+				},
+				"signup_action": "Sign Up",
+				"signup_alternatives_title": "Or sign up with",
+				"signup_existing_account": {
+					"title": "Already have an account?",
+					"action": "Login"
+				}
+			},
+			"about": null,
+			"collections": null,
+			"connect": null,
+			"create-account": null,
+			"create-project": null,
+			"dashboard": null,
+			"discover": null,
+			"login": null,
+			"teams": null,
+			"user": null
+		},
+		"components": {
+			"footer": {
+				"policies": {
+					"title": "Policies",
+					"privacy": "Privacy",
+					"terms_of_service": "Terms Of Service",
+					"copyright": "Copyright",
+					"site_rules": "Site Rules",
+					"security_notice": "Security Notice"
+				},
+				"products": {
+					"title": "Products"
+				}
+			},
+			"navbar": {
+				"discover_menu": {
+					"title": "Discover",
+					"content": {
+						"assets": {
+							"title": "Assets",
+							"description": "Builds"
+						},
+						"worlds": {
+							"title": "Worlds",
+							"description": "Builds"
+						},
+						"collections": {
+							"title": "Collections",
+							"description": "Collections"
+						},
+						"creators": {
+							"title": "Creators",
+							"description": "Creators"
+						},
+						"build_teams": {
+							"title": "Build Teams",
+							"description": "Build Teams"
+						}
+					}
+				},
+				"about_menu": {
+					"title": "About",
+					"content": {
+						"terms_of_service": {
+							"title": "Terms Of Service",
+							"description": "Read and review our terms of service."
+						},
+						"privacy_policy": {
+							"title": "Privacy Policy",
+							"description": "Read and review our privacy policy."
+						},
+						"faq_and_guides": {
+							"title": "FAQ and Guides",
+							"description": "Use the guides to assist you with using this site's tools and more."
+						},
+						"help_and_support": {
+							"title": "Help and Support",
+							"description": "Use out support platform or contact us via Discord."
+						}
+					}
+				},
+				"sign_up": "Sign Up",
+				"login": "Login",
+				"notification_menu": {
+					"content": {
+						"clear_all_notifications_button": {
+							"tooltip_text": "Clear All Notifications"
+						},
+						"disable_popup_text_button": {
+							"tooltip_text": "Disable Popup Toast"
+						},
+						"empty_state": "Nothing to show."
+					}
+				},
+				"user_actions_menu": {
+					"my_account_group": {
+						"group_title": "My Account",
+						"group_content": {
+							"profile": "Profile",
+							"settings": "Settings"
+						}
+					},
+					"create_group": {
+						"group_title": "Create",
+						"group_content": {
+							"new_project": "New Project",
+							"become_a_creator": "Become a Creator"
+						}
+					},
+					"help_group": {
+						"group_title": "Help",
+						"group_content": {
+							"guide": "Guide",
+							"support": "Support"
+						}
+					},
+					"log_out": "Log out"
+				}
+			},
+			"asset_cards": null,
+			"add_contributors": null,
+			"add_media_attachment": null,
+			"custom_editor": null,
+			"descriptive_select": null,
+			"discover_grid": null,
+			"edit_image_dialog": null,
+			"edit_string_dialog": null,
+			"image_editor": null,
+			"notification_entry": null,
+			"notifications": null,
+			"price_indicator": null,
+			"tag_input": null
+		},
+		"fault_messages": {
+			"api": {
+				"project": {
+					"service": {
+						"create": {
+							"create_new_publisher_failed": "Failed to create publisher for {project}"
+						}
+					}
+				}
+			},
+			"web": null
+		}
+	}
+}

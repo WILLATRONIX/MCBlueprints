@@ -17,6 +17,7 @@ export function EditStringDialog({
 	open,
 	title,
 	description,
+	placeholder = "Enter new value here",
 	confirmActionText = "Confirm",
 	defaultStringValue,
 	onConfirmAction,
@@ -25,6 +26,7 @@ export function EditStringDialog({
 	open?: boolean;
 	title?: string;
 	description?: string;
+	placeholder?: string;
 	confirmActionText?: string;
 	defaultStringValue?: string;
 	onOpenChangeAction?: (open: boolean) => void;
@@ -43,7 +45,7 @@ export function EditStringDialog({
 				</DialogHeader>
 				<div className="flex items-center gap-2">
 					<Input
-						placeholder="Enter new value here"
+						placeholder={placeholder}
 						value={inputString}
 						onChange={(event) => {
 							setInputString(event.target.value);

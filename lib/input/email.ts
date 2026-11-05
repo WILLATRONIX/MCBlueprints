@@ -4,6 +4,7 @@ export class Email {
 	public readonly domain: string;
 	public readonly tld: string;
 	public readonly valid: boolean;
+	public readonly descriptiveErrors: boolean;
 	public readonly errors: string[] = [];
 
 	private static readonly MAX_EMAIL_LENGTH = 254;
@@ -12,8 +13,9 @@ export class Email {
 	private static readonly MIN_TLD_LENGTH = 2;
 	private static readonly MAX_TLD_LENGTH = 24;
 
-	constructor(email: string) {
+	constructor(email: string, descriptiveErrors: boolean = false) {
 		this.value = email.trim();
+		this.descriptiveErrors = descriptiveErrors;
 
 		const parts = this.value.split("@");
 
@@ -22,7 +24,7 @@ export class Email {
 			this.domain = "";
 			this.tld = "";
 			this.valid = false;
-			this.errors.push('Email must contain one "@" symbol.');
+			this.pushError('Email must contain one "@" symbol.');
 			return;
 		}
 
@@ -37,78 +39,84 @@ export class Email {
 		this.valid = this.errors.length === 0;
 	}
 
+	private pushError(description: string): void {
+		this.errors.push(
+			this.descriptiveErrors ? description : "Invalid Email Address",
+		);
+	}
+
 	private validate(): void {
 		if (this.value.length > Email.MAX_EMAIL_LENGTH) {
-			this.errors.push(`Email is too long.`);
+			this.pushError("Email is too long.");
 		}
 
 		if (this.local.length === 0) {
-			this.errors.push("Email name cannot be empty.");
+			this.pushError("Email name cannot be empty.");
 		}
 
 		if (this.local.length > Email.MAX_LOCAL_LENGTH) {
-			this.errors.push(`Email name is too long.`);
+			this.pushError("Email name is too long.");
 		}
 
 		if (this.domain.length === 0) {
-			this.errors.push("Domain cannot be empty.");
+			this.pushError("Domain cannot be empty.");
 		}
 
 		if (!this.domain.includes(".")) {
-			this.errors.push("Domain must contain a TLD.");
+			this.pushError("Domain must contain a TLD.");
 		}
 
 		if (
 			this.tld.length < Email.MIN_TLD_LENGTH ||
 			this.tld.length > Email.MAX_TLD_LENGTH
 		) {
-			this.errors.push(
+			this.pushError(
 				`TLD must be between ${Email.MIN_TLD_LENGTH} and ${Email.MAX_TLD_LENGTH} characters.`,
 			);
 		}
 
 		if (!/^[a-zA-Z]+$/.test(this.tld)) {
-			this.errors.push("TLD must contain only letters.");
+			this.pushError("TLD must contain only letters.");
 		}
 
 		if (!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+$/.test(this.local)) {
-			this.errors.push("Local part contains invalid characters.");
+			this.pushError("Local part contains invalid characters.");
 		}
 
 		if (this.local.startsWith(".") || this.local.endsWith(".")) {
-			this.errors.push("Local part cannot start or end with a dot.");
+			this.pushError("Local part cannot start or end with a dot.");
 		}
 
 		if (this.local.includes("..")) {
-			this.errors.push("Local part cannot contain consecutive dots.");
+			this.pushError("Local part cannot contain consecutive dots.");
 		}
 
 		if (!/^[a-zA-Z0-9.-]+$/.test(this.domain)) {
-			this.errors.push("Domain contains invalid characters.");
+			this.pushError("Domain contains invalid characters.");
 		}
 
 		if (this.domain.startsWith("-") || this.domain.endsWith("-")) {
-			this.errors.push("Domain cannot start or end with a hyphen.");
+			this.pushError("Domain cannot start or end with a hyphen.");
 		}
 
 		if (this.domain.includes("..")) {
-			this.errors.push("Domain cannot contain consecutive dots.");
+			this.pushError("Domain cannot contain consecutive dots.");
 		}
 
 		for (const label of this.domain.split(".")) {
 			if (label.length === 0) {
-				this.errors.push("Domain contains empty labels.");
+				this.pushError("Domain contains empty labels.");
 				continue;
 			}
 
 			if (label.length > Email.MAX_LABEL_LENGTH) {
-				this.errors.push(
+				this.pushError(
 					`Domain label "${label}" exceeds ${Email.MAX_LABEL_LENGTH} characters.`,
 				);
 			}
 
 			if (label.startsWith("-") || label.endsWith("-")) {
-				this.errors.push(
+				this.pushError(
 					`Domain label "${label}" cannot start or end with a hyphen.`,
 				);
 			}

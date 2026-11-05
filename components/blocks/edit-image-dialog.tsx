@@ -1,12 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
@@ -16,15 +13,17 @@ export function EditImageDialog({
 	open,
 	onOpenChangeAction,
 	defaultOpen,
+	imageAspectRatioLocked,
 	// onImageChangeAction,
 	defaultImage,
 }: {
 	open?: boolean;
 	defaultOpen?: boolean;
+	imageAspectRatioLocked: boolean;
 	onOpenChangeAction?: (open: boolean) => void;
 	image?: File;
 	// onImageChangeAction: () => void;
-	defaultImage: File;
+	defaultImage: File | null;
 }) {
 	return (
 		<Dialog

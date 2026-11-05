@@ -1,4 +1,3 @@
-import AssetCard from "@/components/blocks/asset-card";
 import DiscoverGrid from "@/components/blocks/discover-grid";
 import Asset from "@/lib/asset";
 

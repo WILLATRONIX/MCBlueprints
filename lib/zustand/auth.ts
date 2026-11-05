@@ -28,6 +28,7 @@ type AuthState = {
 	login: (user: User, auth: Auth) => void;
 	updateUser: (user: Partial<User>) => void;
 	logout: () => void;
+	lastUpdated: number;
 	hasHydrated: boolean;
 };
 
@@ -37,6 +38,7 @@ export const useAuthZStore = create<AuthState>()(
 			user: null,
 			auth: null,
 			isAuthenticated: false,
+			lastUpdated: Date.now(),
 			hasHydrated: false,
 
 			login: (user, auth) =>
@@ -44,6 +46,7 @@ export const useAuthZStore = create<AuthState>()(
 					user,
 					auth,
 					isAuthenticated: true,
+					lastUpdated: Date.now(),
 				})),
 
 			updateUser: (user: Partial<User>) =>

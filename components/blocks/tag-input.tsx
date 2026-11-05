@@ -1,5 +1,6 @@
 "use client";
 
+import { TagRepository } from "@/app/create-project/[...slug]/components/uploadContent/uploadManager";
 import {
 	Tags,
 	TagsContent,
@@ -18,8 +19,10 @@ type Tag = { id: string; label: string };
 
 export default function TagInput({
 	defaultTags,
+	availableTags,
 }: {
 	defaultTags: Tag[];
+	availableTags: TagRepository;
 	className?: string;
 }) {
 	const [selected, setSelected] = useState<string[]>(
@@ -60,13 +63,14 @@ export default function TagInput({
 		setNewTag("");
 	};
 
-	const exactMatch = tags.some(
-		(tag) => tag.label.toLowerCase() === newTag.trim().toLowerCase(),
-	);
-
 	useEffect(() => {
 		const main = () => {
-			setTags(defaultTags);
+			setTags(
+				Object.keys(availableTags ?? {}).map((id) => ({
+					id,
+					label: id,
+				})),
+			);
 			setSelected(
 				defaultTags?.map((tag) => {
 					return tag.id;
@@ -75,11 +79,14 @@ export default function TagInput({
 		};
 
 		main();
-	}, [defaultTags]);
+	}, [defaultTags, availableTags]);
 
 	return (
 		<Tags>
-			<TagsTrigger className="min-h-9 text-sm">
+			<TagsTrigger
+				className="min-h-8 text-sm"
+				inputPlaceholder="Add or create a tag..."
+			>
 				{selected.map((tag) => (
 					<TagsValue key={tag} onRemove={() => handleRemove(tag)}>
 						{tags.find((t) => t.id === tag)?.label}

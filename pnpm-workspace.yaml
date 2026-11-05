@@ -1,4 +1,6 @@
 allowBuilds:
+  '@parcel/watcher': true
+  '@swc/core': true
   sharp: true
   skia-canvas: false
   unrs-resolver: true

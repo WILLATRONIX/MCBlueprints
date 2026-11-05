@@ -27,7 +27,12 @@ export function getClientUtcOffset(date = new Date()) {
 	return `UTC${sign}${hours}:${minutes}`;
 }
 
-export function b64ImageToFile(dataUrl: string, filename: string): File {
+export function b64ImageToFile(
+	dataUrl: string | null,
+	filename: string,
+): File | null {
+	if (!dataUrl) return null;
+
 	const [header, base64] = dataUrl.split(",");
 
 	const mime = header.match(/data:(.*?);base64/)?.[1];

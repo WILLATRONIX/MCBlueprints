@@ -3,10 +3,13 @@
 import { FaultService } from "../fault/faultService";
 import "@/lib/telemetry/console";
 import { Fault } from "../fault/fault";
+import { useNotificationZStore } from "../zustand/notification";
 
 const telemetryBuffer: TelemetryEntry[] = [];
 let publishCooldown = false;
 
+const notificationState = useNotificationZStore.getState();
+console.log(notificationState.entries);
 type TelemetryDeps = {
 	socket?: WebSocket;
 	faultService?: FaultService;
@@ -58,7 +61,7 @@ export class Telemetry {
 		setTimeout(() => {
 			this.publishTelemetry();
 			publishCooldown = false;
-		}, 30_000);
+		}, Number(process.env.NEXT_PUBLIC_TELEMETRY_EMIT_BUFFER_TIMEOUT!));
 	}
 
 	private publishTelemetry(): void {
@@ -66,11 +69,28 @@ export class Telemetry {
 			const socket = this.deps.socket;
 
 			if (!socket) {
-				throw new Fault("WebSocket is not initialized.", "ws_not_found");
+				notificationState.pushClientNotification({
+					title: "Fatal Error",
+					description:
+						"Telemetry Service encountered an error. Please check logs.",
+					type: "warning",
+					showToast: true,
+				});
+				throw new Fault(
+					"WebSocket is not initialized.",
+					"telemetry_websocket_undefined",
+				);
 			}
 
 			if (socket.readyState !== WebSocket.OPEN) {
-				throw new Fault("WebSocket is not open.", "ws_not_open");
+				notificationState.pushClientNotification({
+					title: "Fatal Error",
+					description:
+						"Telemetry Service encountered an error. Please check logs.",
+					type: "warning",
+					showToast: true,
+				});
+				throw new Fault("WebSocket is not open.", "telemetry_websocket_closed");
 			}
 
 			socket.send(JSON.stringify(telemetryBuffer));

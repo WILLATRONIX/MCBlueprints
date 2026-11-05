@@ -19,26 +19,19 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuPortal,
 	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-	Blocks,
 	BookMarked,
 	CircleFadingArrowUpIcon,
-	DollarSign,
 	LogOutIcon,
 	MessagesSquare,
-	Package,
+	Plus,
 	SettingsIcon,
-	Upload,
 	UserIcon,
-	Users,
 } from "lucide-react";
+import { NotificationPopover } from "./notifications";
 
 type NavComponent = {
 	title: string;
@@ -134,8 +127,8 @@ export default function Navbar({
 	const authState = useAuthZStore();
 
 	return (
-		<nav>
-			<div className="h-12 flex items-center justify-between px-2 gap-4">
+		<nav className="shrink-0 max-h-14 bg-background bg-texture ring ring-secondary/20">
+			<div className="h-14 flex items-center justify-between px-2 gap-4">
 				<div className="flex gap-2">
 					<Link href="/" className="shrink-0 flex items-center gap-3">
 						<Image
@@ -184,28 +177,30 @@ export default function Navbar({
 				{children}
 				<div className="flex gap-2">
 					{authState.isAuthenticated ? (
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button size="lg">{authState.user?.displayName}</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-40" align="end">
-								<DropdownMenuGroup>
-									<DropdownMenuLabel>My Account</DropdownMenuLabel>
-									<DropdownMenuItem asChild>
-										<Link href={`/u/${authState.user?.username}`}>
-											<UserIcon />
-											Profile
-										</Link>
-									</DropdownMenuItem>
-									<DropdownMenuItem>
-										<SettingsIcon />
-										Settings
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-								<DropdownMenuSeparator />
-								<DropdownMenuGroup>
-									<DropdownMenuLabel>Create</DropdownMenuLabel>
-									{/*<DropdownMenuSub>
+						<div className="flex gap-2">
+							<NotificationPopover />
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button size="lg">{authState.user?.displayName}</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent className="w-40" align="end">
+									<DropdownMenuGroup>
+										<DropdownMenuLabel>My Account</DropdownMenuLabel>
+										<DropdownMenuItem asChild>
+											<Link href={`/u/${authState.user?.username}`}>
+												<UserIcon />
+												Profile
+											</Link>
+										</DropdownMenuItem>
+										<DropdownMenuItem>
+											<SettingsIcon />
+											Settings
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+									<DropdownMenuSeparator />
+									<DropdownMenuGroup>
+										<DropdownMenuLabel>Create</DropdownMenuLabel>
+										{/*<DropdownMenuSub>
 										<DropdownMenuSubTrigger>
 											<Upload />
 											<Link href={"/upload"}>Upload</Link>
@@ -227,43 +222,44 @@ export default function Navbar({
 											</DropdownMenuSubContent>
 										</DropdownMenuPortal>
 									</DropdownMenuSub>*/}
-									{!authState.user?.isCreator && [
-										<DropdownMenuItem key="upload" asChild>
-											<Link href={"/upload"}>
-												<Upload />
-												Upload
-											</Link>
-										</DropdownMenuItem>,
-										<DropdownMenuItem key="creator">
-											<CircleFadingArrowUpIcon />
-											Become a Creator
-										</DropdownMenuItem>,
-									]}
-									<DropdownMenuItem>
+										{!authState.user?.isCreator && [
+											<DropdownMenuItem key="upload" asChild>
+												<Link href={"/create-project"}>
+													<Plus />
+													New Project
+												</Link>
+											</DropdownMenuItem>,
+											<DropdownMenuItem key="creator">
+												<CircleFadingArrowUpIcon />
+												Become a Creator
+											</DropdownMenuItem>,
+										]}
+										{/*<DropdownMenuItem>
 										<Users />
 										Teams
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-								<DropdownMenuSeparator />
-								<DropdownMenuGroup>
-									<DropdownMenuLabel>Help</DropdownMenuLabel>
-									<DropdownMenuItem>
-										<BookMarked />
-										Guide
-									</DropdownMenuItem>
-									<DropdownMenuItem>
-										<MessagesSquare /> Support
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-								<DropdownMenuSeparator />
-								<DropdownMenuGroup>
-									<DropdownMenuItem>
-										<LogOutIcon />
-										Log out
-									</DropdownMenuItem>
-								</DropdownMenuGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+									</DropdownMenuItem>*/}
+									</DropdownMenuGroup>
+									<DropdownMenuSeparator />
+									<DropdownMenuGroup>
+										<DropdownMenuLabel>Help</DropdownMenuLabel>
+										<DropdownMenuItem>
+											<BookMarked />
+											Guide
+										</DropdownMenuItem>
+										<DropdownMenuItem>
+											<MessagesSquare /> Support
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+									<DropdownMenuSeparator />
+									<DropdownMenuGroup>
+										<DropdownMenuItem variant="destructive">
+											<LogOutIcon />
+											Log out
+										</DropdownMenuItem>
+									</DropdownMenuGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
 					) : (
 						<>
 							<Button size="lg" variant="ghost" asChild>
@@ -272,6 +268,7 @@ export default function Navbar({
 							<Button size="lg" asChild>
 								<Link href="/login">Login</Link>
 							</Button>
+							<NotificationPopover />
 						</>
 					)}
 				</div>

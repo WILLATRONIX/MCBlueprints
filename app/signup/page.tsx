@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Dispatch, SetStateAction } from "react";
 import Navbar from "@/components/blocks/navbar";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { CustomToast } from "@/components/blocks/custom-toast";
 import { useAuthZStore } from "@/lib/zustand/auth";
+import { MCBPS_AuthRegisterSuccess } from "@/lib/types/apiResponses";
+import Script from "next/script";
 
 export default function SignupPage() {
 	const [emailFault, setEmailFault] = useState<Fault | null>(null);
@@ -42,7 +44,14 @@ export default function SignupPage() {
 
 	const [displayErrors, setDisplayErrors] = useState<boolean>(false);
 
-	const faultService = new FaultService(__filename);
+	const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
+	const allInputsValid =
+		emailFault === null &&
+		passwordFault === null &&
+		passwordRepeatFault === null;
+
+	const faultService = new FaultService("/signup");
 	const authState = useAuthZStore();
 	const router = useRouter();
 
@@ -129,32 +138,23 @@ export default function SignupPage() {
 			validate(value);
 		};
 
-	type AuthSuccess = {
-		event: string;
-		success: boolean;
-		user: {
-			id: string;
-			createdAt: string;
-			isCreator: boolean;
-			requiresCreation: boolean;
-		};
-		client: {
-			userId: string;
-		};
-		auth: {
-			allVerified: boolean;
-			anyVerified: boolean;
-			email: string;
-		};
-	};
-
 	const handleSignupClick = async () => {
 		setDisplayErrors(true);
 
+		if (!captchaToken) return;
+
+		if (!allInputsValid) return;
+
 		try {
-			const res = await mcbpsApi.post<AuthSuccess>("/auth/register", {
-				body: { email: emailInputValue, password: passwordInputValue },
-			});
+			const res = await mcbpsApi.post<MCBPS_AuthRegisterSuccess>(
+				"/auth/register",
+				{
+					body: { email: emailInputValue, password: passwordInputValue },
+					headers: {
+						"x-recaptcha-token": captchaToken,
+					},
+				},
+			);
 
 			authState.login(
 				{
@@ -189,11 +189,31 @@ export default function SignupPage() {
 		}
 	};
 
+	useEffect(() => {
+		window.onCaptchaSuccess = (token: string) => {
+			console.log(token);
+			setCaptchaToken(token);
+		};
+
+		window.onCaptchaExpired = () => {
+			setCaptchaToken(null);
+		};
+
+		return () => {
+			delete window.onCaptchaSuccess;
+			delete window.onCaptchaExpired;
+		};
+	}, []);
+
 	return (
 		<>
+			<Script
+				src="https://www.google.com/recaptcha/enterprise.js"
+				strategy="afterInteractive"
+			/>
 			<Navbar />
 			<div className="flex w-full items-center justify-center">
-				<Card className="w-96 mt-20 mx-2">
+				<Card className="w-96 mt-20 mx-2 bg-muted">
 					<CardTitle className="self-center">Sign up to MCBlueprints</CardTitle>
 					<CardContent className="p-0 *:px-4 gap-2 flex flex-col ">
 						<FieldSet className="pb-2">
@@ -254,6 +274,15 @@ export default function SignupPage() {
 										</FieldError>
 									)}
 								</Field>
+								<div
+									className="g-recaptcha"
+									data-sitekey={
+										process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_SITEKEY!
+									}
+									data-action="SIGNUP"
+									data-callback="onCaptchaSuccess"
+									data-expired-callback="onCaptchaExpired"
+								/>
 								<Button
 									className="flex self-center w-36"
 									disabled={

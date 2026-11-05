@@ -20,6 +20,7 @@ import { DisplayName } from "@/lib/input/displayName";
 import { MarkdownInput } from "@/lib/input/markdownInput";
 import { Username } from "@/lib/input/username";
 import { mcbpsApi } from "@/lib/network/client";
+import { MCBPS_UserCreateResponse } from "@/lib/types/apiResponses";
 import { useAuthZStore } from "@/lib/zustand/auth";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
@@ -42,7 +43,7 @@ export default function CreateAccountPage() {
 
 	const [displayErrors, setDisplayErrors] = useState<boolean>(false);
 
-	const faultService = new FaultService(__filename);
+	const faultService = new FaultService("/create-account");
 	const authState = useAuthZStore();
 	const router = useRouter();
 
@@ -105,37 +106,20 @@ export default function CreateAccountPage() {
 			validate(value);
 		};
 
-	type CreateUserResponse = {
-		success: boolean;
-		auth: {
-			allVerified: boolean;
-			anyVerified: boolean;
-			verifiedProviders: string[];
-			unverifiedProviders: string[];
-		};
-		user: {
-			username: string;
-			displayName: string;
-			aboutMeMarkdown: string;
-			aboutMeHtml: string;
-			profileImageUrl: string;
-			isCreator: boolean;
-			updatedAt: string;
-			createdAt: string;
-		};
-	};
-
 	const handleCreateClick = async () => {
 		setDisplayErrors(true);
 
 		try {
-			const res = await mcbpsApi.post<CreateUserResponse>("/user/create", {
-				body: {
-					username: usernameInputValue,
-					displayName: displayNameInputValue,
-					aboutMe: aboutMeInputValue,
+			const res = await mcbpsApi.post<MCBPS_UserCreateResponse>(
+				"/user/create",
+				{
+					body: {
+						username: usernameInputValue,
+						displayName: displayNameInputValue,
+						aboutMe: aboutMeInputValue,
+					},
 				},
-			});
+			);
 
 			authState.updateUser({ ...res.user });
 

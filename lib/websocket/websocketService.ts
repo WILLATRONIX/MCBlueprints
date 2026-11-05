@@ -1,6 +1,8 @@
 import { Fault } from "../fault/fault";
+import { useNotificationZStore } from "../zustand/notification";
 
 let socket: WebSocket | null = null;
+const notificationState = useNotificationZStore.getState();
 
 if (typeof window !== "undefined") {
 	try {
@@ -23,19 +25,27 @@ if (typeof window !== "undefined") {
 		});
 
 		socket.addEventListener("error", (event) => {
-			throw new Fault(
-				"The WebSocket encountered an error",
-				"web_socket_error",
-				{ cause: event },
-			);
+			notificationState.pushClientNotification({
+				title: "Fatal Error",
+				description: "WebSocket encountered an error. Please check logs.",
+				type: "warning",
+				showToast: true,
+			});
+			throw new Fault("The WebSocket encountered an error", "websocket_error", {
+				cause: event,
+			});
 		});
 
 		socket.addEventListener("close", (event) => {
-			throw new Fault(
-				"The WebSocket closed unexpectedly",
-				"web_socket_closure",
-				{ cause: event },
-			);
+			notificationState.pushClientNotification({
+				title: "Fatal Error",
+				description: "WebSocket closed unexpectedly. Please check logs.",
+				type: "error",
+				showToast: true,
+			});
+			throw new Fault("The WebSocket closed unexpectedly", "websocket_closed", {
+				cause: event,
+			});
 		});
 	} catch (error) {
 		console.log(

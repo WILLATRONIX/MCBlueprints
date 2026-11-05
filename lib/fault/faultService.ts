@@ -2,6 +2,7 @@ import { Telemetry } from "../telemetry/telemetryService";
 import { getClientUtcOffset, isStringRecord } from "../utils";
 import socket from "../websocket/websocketService";
 import { Fault } from "./fault";
+import { AppRoutes } from "@/.next/dev/types/routes";
 
 type FaultLevel = "warn" | "error";
 
@@ -62,7 +63,7 @@ class FaultContainer {
  * @param fault The fault to process.
  */
 export class FaultService {
-	constructor(private initiator: string) {}
+	constructor(private initiator: AppRoutes) {}
 
 	raise(fault: Fault) {
 		let metadata = isStringRecord(fault.meta) ? fault.meta : undefined;

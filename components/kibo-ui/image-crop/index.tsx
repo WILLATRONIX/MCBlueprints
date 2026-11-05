@@ -27,6 +27,7 @@ import ReactCrop, {
 import { cn } from "@/lib/utils";
 
 import "react-image-crop/dist/ReactCrop.css";
+import Image from "next/image";
 
 const centerAspectCrop = (
 	mediaWidth: number,
@@ -327,7 +328,7 @@ export const ImageCropContent = ({
 
 	return (
 		<ReactCrop
-			className={cn("max-h-[277px] max-w-full", className)}
+			className={cn("max-h-69.25 max-w-full", className)}
 			crop={crop}
 			onChange={handleChange}
 			onComplete={handleComplete}
@@ -335,7 +336,7 @@ export const ImageCropContent = ({
 			{...reactCropProps}
 		>
 			{imgSrc && (
-				<img
+				<Image
 					alt="crop"
 					className={cn("size-full", flipped && "scale-y-[-1]")}
 					onLoad={onImageLoad}

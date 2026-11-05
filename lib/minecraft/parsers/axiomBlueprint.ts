@@ -3,13 +3,10 @@ import zlib from "zlib";
 
 import { Blueprint } from "../types/AxiomBlueprint";
 import { Region } from "../types/Region";
+import { FileFormat } from "@/lib/types/upload";
 
 type NBTValue =
-	| string
-	| number
-	| boolean
-	| NBTValue[]
-	| { [key: string]: NBTValue };
+	string | number | boolean | NBTValue[] | { [key: string]: NBTValue };
 
 function unwrap(obj: unknown): NBTValue {
 	if (Array.isArray(obj)) return obj.map(unwrap);
@@ -89,7 +86,7 @@ export default async function parseBlueprint(
 	const blockDataUnwrapped = unwrappedBlockData;
 
 	const versionRaw = headerUnwrapped.Version;
-	const versionNumber = Array.isArray(versionRaw)
+	const blueprintVersion = Array.isArray(versionRaw)
 		? Number(versionRaw[0])
 		: Number(versionRaw);
 
@@ -101,11 +98,18 @@ export default async function parseBlueprint(
 	const author = (headerUnwrapped.Author as string) || "";
 	const tags = (headerUnwrapped.Tags as string[]) || [];
 
+	const formats = {
+		0: "BlueprintV0",
+		1: "BlueprintV1",
+		2: "BlueprintV2",
+	} as Record<number, FileFormat>;
+
 	const blueprint = new Blueprint({
+		fileFormat: formats[blueprintVersion],
 		magic,
 		name,
 		blockCount,
-		version: versionNumber,
+		version: blueprintVersion,
 		thumbnail: b64Thumbnail,
 		thumbnailYaw,
 		thumbnailPitch,

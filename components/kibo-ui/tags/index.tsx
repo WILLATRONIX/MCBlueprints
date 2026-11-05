@@ -58,18 +58,18 @@ const useTagsContext = () => {
 
 export type TagsProps = {
 	value?: string;
-	setValue?: (value: string) => void;
+	setValueAction?: (value: string) => void;
 	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
+	onOpenChangeAction?: (open: boolean) => void;
 	children?: ReactNode;
 	className?: string;
 };
 
 export const Tags = ({
 	value,
-	setValue,
+	setValueAction: setValue,
 	open: controlledOpen,
-	onOpenChange: controlledOnOpenChange,
+	onOpenChangeAction: controlledOnOpenChange,
 	children,
 	className,
 }: TagsProps) => {
@@ -114,20 +114,20 @@ export type TagsTriggerProps = ComponentProps<typeof Button>;
 export const TagsTrigger = ({
 	className,
 	children,
+	inputPlaceholder = "Enter a tag...",
 	...props
-}: TagsTriggerProps) => (
+}: TagsTriggerProps & { inputPlaceholder?: string }) => (
 	<PopoverTrigger asChild>
 		<Button
-			className={cn("h-auto w-full justify-between p-2", className)}
+			className={cn("h-auto w-full justify-between p-1", className)}
 			// biome-ignore lint/a11y/useSemanticElements: "Required"
-			wrapperClassName="w-full"
 			role="combobox"
 			variant="outline"
 			{...props}
 		>
 			<div className="flex flex-wrap items-center gap-1">
 				{children}
-				<span className="px-2 py-px text-muted-foreground">Enter a tag...</span>
+				<span className="px-2 text-muted-foreground">{inputPlaceholder}</span>
 			</div>
 		</Button>
 	</PopoverTrigger>
@@ -193,16 +193,12 @@ export const TagsInput = ({ className, ...props }: TagsInputProps) => (
 export type TagsListProps = ComponentProps<typeof CommandList>;
 
 export const TagsList = ({ className, ...props }: TagsListProps) => (
-	<CommandList className={cn("max-h-[200px]", className)} {...props} />
+	<CommandList className={cn("max-h-50", className)} {...props} />
 );
 
 export type TagsEmptyProps = ComponentProps<typeof CommandEmpty>;
 
-export const TagsEmpty = ({
-	children,
-	className,
-	...props
-}: TagsEmptyProps) => (
+export const TagsEmpty = ({ children, ...props }: TagsEmptyProps) => (
 	<CommandEmpty {...props}>{children ?? "No tags found."}</CommandEmpty>
 );
 

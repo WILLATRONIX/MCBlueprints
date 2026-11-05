@@ -1,16 +1,29 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
 	images: {
-		remotePatterns: [new URL("https://static.mcbps.com/**")],
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "static.mcbps.com",
+				pathname: "/**",
+			},
+			{
+				protocol: "https",
+				hostname: "picsum.photos",
+				pathname: "/**",
+			},
+		],
 	},
+	devIndicators: false,
 	async headers() {
 		return [
 			{
 				source: "/:path*",
 				headers: [
 					{
-						// prevent any iframe usage
+						// discourage iframe usage
 						key: "X-Frame-Options",
 						value: "DENY",
 					},
@@ -18,6 +31,16 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
+	async rewrites() {
+		return [
+			{
+				source: "/@:username",
+				destination: "/user/:username",
+			},
+		];
+	},
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
+
+export default withNextIntl(nextConfig);
