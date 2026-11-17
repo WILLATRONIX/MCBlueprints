@@ -5,7 +5,8 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import Script from "next/script";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 
 const oxanium = Oxanium({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -48,14 +49,17 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const messages = await getMessages();
+	const locale = await getLocale();
+
 	return (
 		<html
-			lang="en"
+			lang={locale}
 			suppressHydrationWarning
 			className={cn(
 				"h-screen",
@@ -90,17 +94,19 @@ export default function RootLayout({
 					enableSystem={false}
 					disableTransitionOnChange
 				>
-					<div className="bg-graph">
-						<main className="relative flex flex-1 flex-col min-h-full overflow-x-hidden">
-							<TooltipProvider>{children}</TooltipProvider>
-						</main>
+					<NextIntlClientProvider messages={messages}>
+						<div className="bg-graph">
+							<main className="relative flex flex-1 flex-col min-h-full overflow-x-hidden">
+								<TooltipProvider>{children}</TooltipProvider>
+							</main>
 
-						<Toaster
-							duration={5000}
-							position="top-center"
-							swipeDirections={["right"]}
-						/>
-					</div>
+							<Toaster
+								duration={5000}
+								position="top-center"
+								swipeDirections={["right"]}
+							/>
+						</div>
+					</NextIntlClientProvider>
 				</ThemeProvider>
 			</body>
 		</html>

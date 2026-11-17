@@ -26,6 +26,8 @@ import { CustomToast } from "@/components/blocks/custom-toast";
 import { useAuthZStore } from "@/lib/zustand/auth";
 import { MCBPS_AuthRegisterSuccess } from "@/lib/types/apiResponses";
 import Script from "next/script";
+import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export default function SignupPage() {
 	const [emailFault, setEmailFault] = useState<Fault | null>(null);
@@ -54,6 +56,7 @@ export default function SignupPage() {
 	const faultService = new FaultService("/signup");
 	const authState = useAuthZStore();
 	const router = useRouter();
+	const t = useTranslations("mcbps.pages.signup");
 
 	const validateEmail = (value: string | null) => {
 		if (value === null) {
@@ -214,18 +217,18 @@ export default function SignupPage() {
 			<Navbar />
 			<div className="flex w-full items-center justify-center">
 				<Card className="w-96 mt-20 mx-2 bg-muted">
-					<CardTitle className="self-center">Sign up to MCBlueprints</CardTitle>
+					<CardTitle className="self-center">{t("signup_title")}</CardTitle>
 					<CardContent className="p-0 *:px-4 gap-2 flex flex-col ">
 						<FieldSet className="pb-2">
 							<FieldGroup>
 								<Field>
-									<FieldLabel htmlFor="email">Email</FieldLabel>
+									<FieldLabel htmlFor="email">{t("email_input.descriptor")}</FieldLabel>
 									<Input
 										value={emailInputValue ?? ""}
 										id="email"
 										autoComplete="off"
 										aria-invalid={displayErrors && emailFault !== null}
-										placeholder="Enter your email"
+										placeholder={t("email_input.placeholder")}
 										onChange={onInputChange(setEmailInputValue, validateEmail)}
 									/>
 									{emailFault !== null && displayErrors && (
@@ -235,14 +238,14 @@ export default function SignupPage() {
 									)}
 								</Field>
 								<Field>
-									<FieldLabel htmlFor="password">Password</FieldLabel>
+									<FieldLabel htmlFor="password">{t("password_input.descriptor")}</FieldLabel>
 									<Input
 										value={passwordInputValue ?? ""}
 										id="password"
 										type="password"
 										autoComplete="off"
 										aria-invalid={displayErrors && passwordFault !== null}
-										placeholder="Create a password"
+										placeholder={t("password_input.placeholder")}
 										onChange={onInputChange(
 											setPasswordInputValue,
 											onPasswordChange,
@@ -255,14 +258,14 @@ export default function SignupPage() {
 									)}
 								</Field>
 								<Field>
-									<FieldLabel htmlFor="password">Repeat Password</FieldLabel>
+									<FieldLabel htmlFor="password">{t("repeat_password_input.descriptor")}</FieldLabel>
 									<Input
 										value={passwordRepeatInputValue ?? ""}
 										id="passwordrepeat"
 										type="password"
 										autoComplete="off"
 										aria-invalid={displayErrors && passwordRepeatFault !== null}
-										placeholder="Enter your password again"
+										placeholder={t("repeat_password_input.placeholder")}
 										onChange={onInputChange(
 											setPasswordRepeatInputValue,
 											onPasswordRepeatChange,
@@ -292,12 +295,12 @@ export default function SignupPage() {
 									}
 									onClick={handleSignupClick}
 								>
-									Sign Up
+									{t("signup_action")}
 								</Button>
 							</FieldGroup>
 						</FieldSet>
 						<Separator />
-						<p className="self-center text-muted-foreground">Or sign up with</p>
+						<p className="self-center text-muted-foreground">{t("signup_alternatives_title")}</p>
 						<div className="flex justify-between mx-4 pt-2">
 							<Button variant="outline">
 								<Image
@@ -332,7 +335,8 @@ export default function SignupPage() {
 					</CardContent>
 
 					<CardFooter>
-						<p>Already have an account? Login</p>
+						<p>{t("signup_existing_account.title")}&nbsp;</p>
+						<Link href={"/login"}>{t("signup_existing_account.action")}</Link>
 					</CardFooter>
 				</Card>
 			</div>

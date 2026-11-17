@@ -12,6 +12,7 @@ import Navbar from "@/components/blocks/navbar";
 import Footer from "@/components/blocks/footer";
 import LargeImageAssetCard from "@/components/blocks/asset-cards/large-image";
 import { getTranslations } from "next-intl/server";
+import { Input } from "@/components/ui/input";
 
 const featureCardsContent = [
 	{
